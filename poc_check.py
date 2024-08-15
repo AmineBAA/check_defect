@@ -1,12 +1,12 @@
 import streamlit as st
-import tensorflow as tf
 import numpy as np
 from PIL import Image
+from tflite_runtime.interpreter import Interpreter
 
 # Function to load the TFLite model
 def load_model(tflite_model_path):
     # Load the TFLite model and allocate tensors
-    interpreter = tf.lite.Interpreter(model_path=tflite_model_path)
+    interpreter = Interpreter(model_path=tflite_model_path)
     interpreter.allocate_tensors()
     return interpreter
 
@@ -37,28 +37,4 @@ def predict(interpreter, image):
 # Streamlit app
 st.title("Image Classification with TFLite Model")
 
-# Upload image
-uploaded_file = st.file_uploader("Choose an image...", type=["jpg", "jpeg", "png"])
-if uploaded_file is not None:
-    image = Image.open(uploaded_file)
-    st.image(image, caption="Uploaded Image", use_column_width=True)
-
-    # Load the TFLite model
-    interpreter = load_model('my_model.tflite')
-    
-    # Preprocess the image
-    preprocessed_image = preprocess_image(image)
-    
-    # Make a prediction
-    prediction = predict(interpreter, preprocessed_image)
-    
-    # Interpret the prediction
-    class_labels = ["Class 0", "Class 1"]  # Update with your actual class labels
-    predicted_class = np.argmax(prediction, axis=1)[0]
-    confidence = np.max(prediction)
-    
-    st.write(f"Predicted Class: {class_labels[predicted_class]}")
-    st.write(f"Confidence: {confidence:.2f}")
-
-# Run the Streamlit app with:
-# streamlit run app.py
+# 
