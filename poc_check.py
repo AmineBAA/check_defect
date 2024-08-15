@@ -1,14 +1,11 @@
 import streamlit as st
+import onnxruntime as ort
 import numpy as np
 from PIL import Image
 
-
-# Function to load the TFLite model
-def load_model(tflite_model_path):
-    # Load the TFLite model and allocate tensors
-    interpreter = tf.lite.Interpreter(model_path=tflite_model_path)
-    interpreter.allocate_tensors()
-    return interpreter
+# Function to load the ONNX model
+def load_model(onnx_model_path):
+    return ort.InferenceSession(onnx_model_path)
 
 # Function to preprocess the image
 def preprocess_image(image, target_size=(224, 224)):
@@ -18,24 +15,15 @@ def preprocess_image(image, target_size=(224, 224)):
     image = np.expand_dims(image, axis=0)  # Add batch dimension
     return image
 
-# Function to make predictions using the TFLite model
-def predict(interpreter, image):
-    # Get input and output tensors
-    input_details = interpreter.get_input_details()
-    output_details = interpreter.get_output_details()
-    
-    # Set the tensor to point to the input data to be inferred
-    interpreter.set_tensor(input_details[0]['index'], image)
-    
-    # Run inference
-    interpreter.invoke()
-    
-    # Get the results from the output tensor
-    output_data = interpreter.get_tensor(output_details[0]['index'])
-    return output_data
+# Function to make predictions using the ONNX model
+def predict(session, image):
+    input_name = session.get_inputs()[0].name
+    output_name = session.get_outputs()[0].name
+    result = session.run([output_name], {input_name: image})
+    return result[0]
 
 # Streamlit app
-st.title("Image Classification with TFLite Model")
+st.title("Image Classification with ONNX Model")
 
 # Upload image
 uploaded_file = st.file_uploader("Choose an image...", type=["jpg", "jpeg", "png"])
@@ -43,14 +31,14 @@ if uploaded_file is not None:
     image = Image.open(uploaded_file)
     st.image(image, caption="Uploaded Image", use_column_width=True)
 
-    # Load the TFLite model
-    interpreter = load_model('my_model.tflite')
+    # Load the ONNX model
+    session = load_model('my_model.onnx')
     
     # Preprocess the image
     preprocessed_image = preprocess_image(image)
     
     # Make a prediction
-    prediction = predict(interpreter, preprocessed_image)
+    prediction = predict(session, preprocessed_image)
     
     # Interpret the prediction
     class_labels = ["Class 0", "Class 1"]  # Update with your actual class labels
@@ -59,6 +47,3 @@ if uploaded_file is not None:
     
     st.write(f"Predicted Class: {class_labels[predicted_class]}")
     st.write(f"Confidence: {confidence:.2f}")
-
-# Run the Streamlit app with:
-# streamlit run app.py
