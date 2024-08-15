@@ -1,4 +1,5 @@
+--upgrade pip
 streamlit
 scikit-learn
 tflite-runtime
-flite.whl
+
