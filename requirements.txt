@@ -1,5 +1,5 @@
 
 streamlit
 scikit-learn
-tflite-runtime==2.5.0
+tensorflow==2.13.0
 
