@@ -1,5 +1,3 @@
 streamlit
 scikit-learn
-openpyxl
-nltk
-tensorflow
+tflite-runtime
