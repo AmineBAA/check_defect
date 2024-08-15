@@ -1,7 +1,7 @@
 import streamlit as st
 import numpy as np
 from PIL import Image
-import tensorflow as tf
+
 
 # Function to load the TFLite model
 def load_model(tflite_model_path):
